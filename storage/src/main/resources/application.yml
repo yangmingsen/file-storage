@@ -1,6 +1,6 @@
 spring:
   r2dbc:
-    url: r2dbc:mysql://localhost:3306/file-storage
+    url: r2dbc:mysql://localhost:3306/file_storage_prov
     username: root
     password: ymsyms
   servlet:
