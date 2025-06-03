@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+top.yms.storage.client.config.StorageClientAutoConfiguration
