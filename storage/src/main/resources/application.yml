@@ -9,9 +9,9 @@ spring:
       max-request-size: 50MB
 
 server:
-  port: 9005
+  port: 8005
 
 storage:
     base:
       path: D:/TestEnv/file-storage/
-      url: http://localhost:9005/file/storage/
+      url: http://localhost:8005/file/storage/
