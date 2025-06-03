@@ -13,5 +13,5 @@ server:
 
 storage:
     base:
-      path: D:/TestEnv/file-storage/
+      path: D:/Soft/PersonalSoft/Server/file-storage/data/
       url: http://localhost:9005/file/storage/
