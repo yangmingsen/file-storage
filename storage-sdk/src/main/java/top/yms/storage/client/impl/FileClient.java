@@ -19,6 +19,7 @@ import top.yms.storage.entity.UploadResp;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -93,7 +94,17 @@ public class FileClient {
             // 写入分界线
             out.write(("--" + boundary + "\r\n").getBytes());
             // 文件部分头
-            out.write(("Content-Disposition: form-data; name=\"file\"; filename=\"" + fileName + "\"\r\n").getBytes());
+//            String encodedFileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+            //RFC 5987 标准：filename*=UTF-8'' + URL 编码的文件名。
+//            out.write(("Content-Disposition: form-data; name=\"file\"; filename*=UTF-8''" + encodedFileName + "\r\n").getBytes(StandardCharsets.UTF_8));
+            //使用 rfc 5987 发现 服务端无法解析 出现 java.lang.IllegalStateException: argument type mismatch
+            // Spring WebFlux 无法把当前请求中的 Part 自动映射到 @RequestPart("file") FilePart filePart 方法参数上。 (value=Part 'file', headers=[content-disposition:"form-data; name="file"; filename*=UTF-8''xxx.xlsx"])
+            // filename*=UTF-8''xxx.xlsx RFC 5987 格式的文件名写法，但 Spring WebFlux（尤其是 Spring Boot 2.3.x 使用的 SynchronossPartHttpMessageReader）不支持这种写法的自动绑定！
+            //
+            //Spring Boot 2.0 ~ 2.5 默认使用 SynchronossPartHttpMessageReader
+            //它基于 Synchronoss NIO multipart parser —— 不支持 filename*= 解析为 FilePart
+            //到 Spring Boot 2.5 之后，WebFlux 才改成用 DefaultPartHttpMessageReader
+            out.write(("Content-Disposition: form-data; name=\"file\"; filename=\"" + fileName + "\"\r\n").getBytes(StandardCharsets.UTF_8));
             out.write(("Content-Type: " + contentType + "\r\n\r\n").getBytes());
             // 写文件内容
             byte[] buffer = new byte[8192];
