@@ -9,6 +9,7 @@
 
     <artifactId>storage-sdk</artifactId>
     <packaging>jar</packaging>
+    <version>1.0.1</version>
 
     <name>storage-sdk</name>
     <url>http://maven.apache.org</url>

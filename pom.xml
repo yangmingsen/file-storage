@@ -29,7 +29,13 @@
   </properties>
 
   <dependencyManagement>
-
+    <dependencies>
+      <dependency>
+        <groupId>top.yms.framework</groupId>
+        <artifactId>mingyang-framework-common</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+    </dependencies>
   </dependencyManagement>
 
   <build>
