@@ -24,8 +24,6 @@ public class BaseResponse <T>{
         this.data = data;
     }
 
-    public BaseResponse() {
-    }
 
     public static <T> BaseResponse<T> success(T data) {
         return new BaseResponse<>(MsgCd.SUCCESS, data);

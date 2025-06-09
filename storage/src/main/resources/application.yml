@@ -1,12 +1,12 @@
 spring:
   r2dbc:
-    url: r2dbc:mysql://localhost:3306/file-storage
+    url: r2dbc:mysql://localhost:3306/file_storage_test
     username: root
     password: ymsyms
   servlet:
     multipart:
-      max-file-size: 50MB
-      max-request-size: 50MB
+      max-file-size: 500MB
+      max-request-size: 500MB
 
 server:
   port: 8005
