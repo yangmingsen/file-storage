@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import top.yms.storage.component.IdWorker;
+import top.yms.storage.constants.StorageConstants;
 import top.yms.storage.em.MsgCd;
 import top.yms.storage.entity.*;
 import top.yms.storage.repo.FileMetaRepository;
@@ -42,21 +43,25 @@ public class StorageServiceImpl implements StorageService {
     @Value("${storage.base.url}")
     private String baseUrl;
 
+    @Value("${storage.write-strategy:DATE}")
+    private String writeStrategy;
+
     @Resource
     private FileMetaRepository fileMetaRepository;
 
     @Resource
     private IdWorker idWorker;
 
+    private String getWriteStrategy() {
+        return writeStrategy;
+    }
+
+
     @Override
     public Mono<BaseResponse<UploadResp>> storage(FilePart filePart) {
         long id = idWorker.nextId();
         String filename = filePart.filename();
-        String datePath = LocalDate.now().toString().replace("-", "/");
-        Path dirPath = Paths.get(basePath, datePath);
         String finalFileName = id + "_" + filename;
-        Path filePath = dirPath.resolve(finalFileName);
-        File file = filePath.toFile();
         MediaType contentType = filePart.headers().getContentType();
         log.debug("file={}, content type = {}", finalFileName, contentType);
         try {
@@ -72,11 +77,27 @@ public class StorageServiceImpl implements StorageService {
             log.error("get file type error", e);
         }
         String fileType = contentType.toString();
+        String tmpRelativePath;
+        Path dirPath;
+        //path set
+        if (StorageConstants.HASH_STRATEGY.equals(getWriteStrategy())) {
+            // 基于 hash 的策略：800 个目录
+            int hashBucket = Math.abs(filename.hashCode()) % 800;
+            String hashDir = String.format("hash/%03d", hashBucket); // 目录形如 hash/000 ~ hash/799
+            dirPath = Paths.get(basePath, hashDir);
+            tmpRelativePath = hashDir + "/" + finalFileName;
+        } else {
+            String datePath = LocalDate.now().toString().replace("-", "/");
+            dirPath = Paths.get(basePath, datePath);
+            tmpRelativePath = datePath+"/"+finalFileName;
+        }
+        log.debug("relativePath={}", tmpRelativePath);
+        final String relativePath = tmpRelativePath;
+        Path filePath = dirPath.resolve(finalFileName);
+        File file = filePath.toFile();
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
-        String relativePath = datePath+"/"+finalFileName;
-        log.debug("relativePath={}", relativePath);
         MessageDigest md5Digest;
         try {
             md5Digest = MessageDigest.getInstance("MD5");
@@ -103,7 +124,7 @@ public class StorageServiceImpl implements StorageService {
                     metadata.setName(filename);
                     metadata.setPath(relativePath);
                     metadata.setFileId(id+"");
-                    metadata.setSize((Long)acc[0]);
+                    metadata.setSize(acc[0]);
                     metadata.setType(fileType);
                     metadata.setCreateTime(LocalDateTime.now());
                     metadata.setMd5(bytesToHex(md5Digest.digest()));

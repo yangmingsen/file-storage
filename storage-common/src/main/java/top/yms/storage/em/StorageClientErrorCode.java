@@ -18,11 +18,11 @@ public enum StorageClientErrorCode implements ErrorCode{
 
     @Override
     public int getCode() {
-        return 0;
+        return code;
     }
 
     @Override
     public String getDesc() {
-        return "";
+        return desc;
     }
 }
