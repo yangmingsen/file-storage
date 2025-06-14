@@ -7,6 +7,10 @@ public class BaseResponse <T>{
     private String message;
     private T data;
 
+    public BaseResponse() {
+
+    }
+
     public BaseResponse(MsgCd msgCd) {
         this.code = msgCd.getCode();
         this.message = msgCd.getMessage();
