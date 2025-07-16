@@ -15,5 +15,5 @@ storage:
     base:
       path: D:/TestEnv/file-storage/
       url: http://localhost:8005/file/storage/
-    write-strategy: HASH
+    write-strategy: DATE #HASH-hash模式 DATE-日期模式
 

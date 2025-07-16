@@ -22,11 +22,6 @@ import java.nio.file.Paths;
 @RequestMapping("/file/storage")
 public class StorageController {
 
-    @GetMapping("/test")
-    public Mono<String> test() {
-        return Mono.just("hello world");
-    }
-
     @Resource
     private StorageService storageService;
 
