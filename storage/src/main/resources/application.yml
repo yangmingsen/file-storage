@@ -1,6 +1,6 @@
 spring:
   r2dbc:
-    url: r2dbc:mysql://localhost:3306/file_storage_test?serverTimezone=Asia/Shanghai
+    url: r2dbc:mysql://localhost:3306/file_storage_prov?serverTimezone=Asia/Shanghai
     username: root
     password: ymsyms
   servlet:
@@ -9,7 +9,7 @@ spring:
       max-request-size: 500MB
 
 server:
-  port: 8005
+  port: 9005
 
 storage:
     base:
