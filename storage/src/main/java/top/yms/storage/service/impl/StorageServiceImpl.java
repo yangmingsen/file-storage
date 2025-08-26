@@ -31,6 +31,7 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class StorageServiceImpl implements StorageService {
@@ -52,8 +53,22 @@ public class StorageServiceImpl implements StorageService {
     @Resource
     private IdWorker idWorker;
 
+    private final AtomicInteger seqNum = new AtomicInteger(0);
+
+    private final int HASH_LEN = 800;
+
     private String getWriteStrategy() {
         return writeStrategy;
+    }
+
+    /**
+     * 环形 000-799
+     * @return
+     */
+    private int getRingHashBucket()  {
+        int rs = seqNum.get() % HASH_LEN;
+        seqNum.getAndIncrement();
+        return rs;
     }
 
 
@@ -80,9 +95,12 @@ public class StorageServiceImpl implements StorageService {
         String tmpRelativePath;
         Path dirPath;
         //path set
-        if (StorageConstants.HASH_STRATEGY.equals(getWriteStrategy())) {
+        if (StorageConstants.HASH_STRATEGY.equals(getWriteStrategy()) || StorageConstants.RING_STRATEGY.equals(getWriteStrategy()) ) {
             // 基于 hash 的策略：800 个目录
-            int hashBucket = Math.abs(filename.hashCode()) % 800;
+            int hashBucket = Math.abs(filename.hashCode()) % HASH_LEN;
+            if (StorageConstants.RING_STRATEGY.equals(getWriteStrategy())) {
+                hashBucket = getRingHashBucket();
+            }
             String hashDir = String.format("hash/%03d", hashBucket); // 目录形如 hash/000 ~ hash/799
             dirPath = Paths.get(basePath, hashDir);
             tmpRelativePath = hashDir + "/" + finalFileName;
