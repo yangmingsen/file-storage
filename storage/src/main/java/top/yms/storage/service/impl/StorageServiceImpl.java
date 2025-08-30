@@ -1,5 +1,7 @@
 package top.yms.storage.service.impl;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -10,12 +12,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import top.yms.storage.cache.RequestContextCache;
 import top.yms.storage.component.IdWorker;
 import top.yms.storage.constants.StorageConstants;
 import top.yms.storage.em.MsgCd;
 import top.yms.storage.entity.*;
+import top.yms.storage.filter.StorageRequestContext;
+import top.yms.storage.filter.StorageRequestContextHolder;
 import top.yms.storage.repo.FileMetaRepository;
 import top.yms.storage.service.StorageService;
 
@@ -73,7 +79,10 @@ public class StorageServiceImpl implements StorageService {
 
 
     @Override
-    public Mono<BaseResponse<UploadResp>> storage(FilePart filePart) {
+    public Mono<BaseResponse<UploadResp>> storage(FilePart filePart, ServerWebExchange exchange) {
+        String reqId = exchange.getRequest().getHeaders().getFirst(StorageConstants.REQ_ID);
+        StorageRequestContext src = RequestContextCache.clearAfterGet(reqId);
+        log.info("src={}", JSON.toJSONString(src, JSONWriter.Feature.PrettyFormat));
         long id = idWorker.nextId();
         String filename = filePart.filename();
         String finalFileName = id + "_" + filename;
@@ -146,6 +155,7 @@ public class StorageServiceImpl implements StorageService {
                     metadata.setType(fileType);
                     metadata.setCreateTime(LocalDateTime.now());
                     metadata.setMd5(bytesToHex(md5Digest.digest()));
+                    metadata.setSysId(src.getSysId());
                     UploadResp uploadResp = new UploadResp();
                     uploadResp.setFileId(id+"");
                     uploadResp.setViewUrl(baseUrl+"preview/"+id);

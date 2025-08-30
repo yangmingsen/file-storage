@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import top.yms.storage.entity.BaseResponse;
 import top.yms.storage.entity.DeleteResp;
@@ -26,9 +27,9 @@ public class StorageController {
     private StorageService storageService;
 
     @PostMapping("/upload")
-    public Mono<BaseResponse<UploadResp>> upload(@RequestPart("file") FilePart filePart) {
+    public Mono<BaseResponse<UploadResp>> upload(@RequestPart("file") FilePart filePart, ServerWebExchange exchange) {
         // 使用 Reactor 异步流处理上传
-        return storageService.storage(filePart);
+        return storageService.storage(filePart, exchange);
     }
 
     @GetMapping("/download/{id}")

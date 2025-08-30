@@ -2,8 +2,7 @@ package top.yms.storage;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
-import top.yms.storage.client.impl.FileClient;
+import top.yms.storage.client.impl.FileClient2;
 import top.yms.storage.entity.BaseResponse;
 import top.yms.storage.entity.FileMetaVo;
 import top.yms.storage.entity.UploadResp;
@@ -20,7 +19,7 @@ public class AppTest
    // @org.junit.jupiter.api.Test
     public void test() {
         File file = new File("C:\\Users\\yangmingsen\\Downloads\\storage\\pom.xml");
-        FileClient fileClient = new FileClient("http://localhost:9005");
+        FileClient2 fileClient = new FileClient2("http://localhost:9005");
         try {
             BaseResponse<UploadResp> upload = fileClient.upload(file);
             ObjectMapper mapper = new ObjectMapper();
@@ -33,7 +32,7 @@ public class AppTest
 
     // @org.junit.jupiter.api.Test
     public void testGetMetaInfo() {
-        FileClient fileClient = new FileClient("http://localhost:9005");
+        FileClient2 fileClient = new FileClient2("http://localhost:9005");
         try {
             BaseResponse<FileMetaVo> info = fileClient.getFileMetaInfo(192841468683196825L+"");
             ObjectMapper mapper = new ObjectMapper();

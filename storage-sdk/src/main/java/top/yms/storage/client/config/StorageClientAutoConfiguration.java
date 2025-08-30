@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import top.yms.storage.client.StorageClient;
 import top.yms.storage.client.impl.FileClient;
+import top.yms.storage.client.impl.FileClient2;
 import top.yms.storage.client.impl.StorageClientImpl;
 
 @Configuration
@@ -20,6 +21,8 @@ public class StorageClientAutoConfiguration {
     @ConditionalOnMissingBean
     public StorageClient storageClient(StorageClientProperties props) {
         log.info("storage sdk config={}", props);
-        return new StorageClientImpl(new FileClient(props.getBaseUrl()));
+//        FileClient fileClient = new FileClient(props.getBaseUrl());
+        FileClient fileClient = new FileClient(props.getBaseUrl(), props.getToken(), props.getSysId());
+        return new StorageClientImpl(fileClient);
     }
 }
