@@ -1,0 +1,19 @@
+spring:
+  r2dbc:
+    url: r2dbc:mysql://localhost:3306/file_storage_test?serverTimezone=Asia/Shanghai
+    username: root
+    password: ymsyms
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+
+server:
+  port: 8005
+
+storage:
+  base:
+    path: D:/TestEnv/file-storage/
+    url: http://localhost:8005/file/storage/
+  write-strategy: RING #HASH-hash模式 DATE-日期模式 RING
+
